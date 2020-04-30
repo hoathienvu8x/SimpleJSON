@@ -1,10 +1,11 @@
-
-#pragma once
+#ifndef _JSON_H
+#define _JSON_H
 
 #include <cstdint>
 #include <cmath>
 #include <cctype>
 #include <string>
+#include <sstream>
 #include <deque>
 #include <map>
 #include <type_traits>
@@ -39,6 +40,13 @@ namespace {
                 default  : output += str[i]; break;
             }
         return std::move( output );
+    }
+    // https://stackoverflow.com/a/35345427
+    template < typename Type >
+    std::string to_str (const Type & t) {
+        std::ostringstream os;
+        os << t;
+        return os.str ();
     }
 }
 
@@ -334,6 +342,45 @@ class JSON
             return JSONConstWrapper<deque<JSON>>( nullptr );
         }
 
+        string stringify() const {
+            switch( Type ) {
+                case Class::Null:
+                    return "null";
+                case Class::Object: {
+                    string s = "{";
+                    bool skip = true;
+                    for( auto &p : *Internal.Map ) {
+                        if( !skip ) s += ",";
+                        s += ( "\"" + p.first + "\":" + p.second.stringify() );
+                        skip = false;
+                    }
+                    s += ( "}" ) ;
+                    return s;
+                }
+                case Class::Array: {
+                    string s = "[";
+                    bool skip = true;
+                    for( auto &p : *Internal.List ) {
+                        if( !skip ) s += ",";
+                        s += p.stringify();
+                        skip = false;
+                    }
+                    s += "]";
+                    return s;
+                }
+                case Class::String:
+                    return "\"" + json_escape( *Internal.String ) + "\"";
+                case Class::Floating:
+                    return to_str( Internal.Float );
+                case Class::Integral:
+                    return to_str( Internal.Int );
+                case Class::Boolean:
+                    return Internal.Bool ? "true" : "false";
+                default:
+                    return "";
+            }
+            return "";
+        }
         string dump( int depth = 1, string tab = "  ") const {
             string pad = "";
             for( int i = 0; i < depth; ++i, pad += tab );
@@ -434,7 +481,7 @@ JSON Object() {
 }
 
 std::ostream& operator<<( std::ostream &os, const JSON &json ) {
-    os << json.dump();
+    os << json.stringify();
     return os;
 }
 
@@ -647,3 +694,5 @@ JSON JSON::Load( const string &str ) {
 }
 
 } // End Namespace json
+#endif
+
