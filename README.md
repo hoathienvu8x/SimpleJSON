@@ -46,7 +46,7 @@ int main() {
   std::cout << obj << std::endl;
 }
 ```
-Output:
+Output: *originally*
 ``` 
 {
   "array" : [true, "Two", 3, 4.000000],
@@ -65,6 +65,12 @@ Output:
       "Key" : "Value"
     }, false]
 }
+```
+
+when change `dump` function to `stringify` function to output stream the result will be:
+
+```
+{"array":[true,"Two",3,4.0],"array2":[false,"three"],"new":{"some":{"deep":{"key":"Value"}}},"obj":{"inner":"Inside"},"parsed":[{"Key":"Value"},false]}
 ```
 
 This example can also be written another way:
