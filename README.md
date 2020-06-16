@@ -21,6 +21,25 @@ One of the biggests goals for SimpleJSON is for it to be lightweight, and small.
 
 If you run into any bugs, or see that I'm missing a featuer, please submit an issue through GitHub and I'll respond as soon as I can!
 
+## To check data
+
+```cpp 
+if (obj.IsNull()) // Check is null
+if(obj.JSONType() != json::JSON::Class::Array) // check is array
+if(obj.size() <= 0) // check size of json
+obj.at(0).ToString(); // get string at index of array
+obj["key"].ToString(); // get string by key
+```
+
+## To loop
+
+```cpp 
+for(auto &it : obj.ArrayRange()) // loop array
+for(auto &it : obj.ObjectRange()) // Loop object
+```
+
+`&it` that mean `it.protype` if `it` that mean `it->protype`
+
 ## Example
 More examples can be found in the 'examples' directory. Check out [the API](API.md) for a full list of functions.
 
@@ -44,10 +63,13 @@ int main() {
   obj["parsed"] = JSON::Load( "[ { \"Key\" : \"Value\" }, false ]" );
   
   std::cout << obj << std::endl;
+  std::cout << obj.dump() << std::endl;
 }
 ```
 Output:
 ``` 
+{"array":[true, "Two", 3, 4.000000],"array2":[false,"three"],"new":{"some":{"deep":{"key":"Value"}}},"obj":{"inner":"Inside"},"parsed":[{"Key":"Value"},false]}
+
 {
   "array" : [true, "Two", 3, 4.000000],
   "array2" : [false, "three"],
